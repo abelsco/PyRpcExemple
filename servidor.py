@@ -1,3 +1,4 @@
+import sys
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
@@ -6,33 +7,34 @@ from xmlrpc.server import SimpleXMLRPCRequestHandler
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2', )
 
-# Cria o servidor
-with SimpleXMLRPCServer(('localhost', 8000),
-                        requestHandler=RequestHandler) as server:
-    server.register_introspection_functions()
 
-    # Para metodos existentes
+if __name__ == "__main__":
+    # Cria o servidor
+    with SimpleXMLRPCServer((sys.argv[1], int(sys.argv[2])),requestHandler=RequestHandler) as server:
+        server.register_introspection_functions()
 
-    # Registra a função elevado(pow)
-    server.register_function(pow)
+        # Para metodos existentes
 
-    # Para metodos criados
-    # Cria a função soma
-    def soma(x, y):
-        return x + y
+        # Registra a função elevado(pow)
+        server.register_function(pow)
 
-    server.register_function(soma, 'soma')
+        # Para metodos criados
+        # Cria a função soma
+        def soma(x, y):
+            return x + y
 
-    # Para classes criadas
-    # Cria a classe Operador com metodos de multiplicação e divisão
-    # todos os metodos serão importados
-    class Operador:
-        def mult(self, x, y):
-            return x * y
-        def div(self, x, y):
-            return x / y
+        server.register_function(soma, 'soma')
 
-    server.register_instance(Operador())
+        # Para classes criadas
+        # Cria a classe Operador com metodos de multiplicação e divisão
+        # todos os metodos serão importados
+        class Operador:
+            def mult(self, x, y):
+                return x * y
+            def div(self, x, y):
+                return x / y
 
-    # Roda o servidor em loop
-    server.serve_forever()
+        server.register_instance(Operador())
+
+        # Roda o servidor em loop
+        server.serve_forever()
